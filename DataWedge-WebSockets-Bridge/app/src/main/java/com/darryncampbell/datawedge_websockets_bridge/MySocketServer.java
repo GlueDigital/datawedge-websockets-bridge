@@ -6,6 +6,8 @@ import android.util.Log;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import java.net.InetSocketAddress;
+import java.util.Date;
+
 import org.java_websocket.server.WebSocketServer;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +17,7 @@ public class MySocketServer extends WebSocketServer {
     private WebSocket mSocket;
     private static final String TAG = "Datawedge WS Bridge";
     private Intent bufferedScan = null;
+    private Date bufferedScanDate = null;
     private Context context;
     private static final String datawedge_intent_key_source = "com.symbol.datawedge.source";
     private static final String datawedge_intent_key_label_type = "com.symbol.datawedge.label_type";
@@ -31,8 +34,12 @@ public class MySocketServer extends WebSocketServer {
         Log.i(TAG, "onOpen");
         if (bufferedScan != null && bufferedScan.getAction().equals(WebSocketIntentService.datawedge_intent_key_action))
         {
-            sendScanToBrowser(bufferedScan);
+            // If the buffer is more than 3s old, we should disregard it already.
+            if (new Date().getTime() - bufferedScanDate.getTime() < 3000) {
+                sendScanToBrowser(bufferedScan);
+            }
             bufferedScan = null;
+            bufferedScanDate = null;
         }
     }
 
@@ -89,5 +96,6 @@ public class MySocketServer extends WebSocketServer {
 
     public void setBufferedScan(Intent bufferedScan) {
         this.bufferedScan = bufferedScan;
+        this.bufferedScanDate = new Date();
     }
 }
