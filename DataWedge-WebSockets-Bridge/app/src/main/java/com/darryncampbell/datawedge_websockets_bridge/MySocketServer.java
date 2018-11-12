@@ -77,8 +77,7 @@ public class MySocketServer extends WebSocketServer {
             String decodedSource = intent.getStringExtra(datawedge_intent_key_source);
             String decodedData = intent.getStringExtra(datawedge_intent_key_data);
             String decodedLabelType = intent.getStringExtra(datawedge_intent_key_label_type);
-            String message = "Barcode (" + decodedData + ") [" + decodedLabelType + "]";
-            mSocket.send(message);
+            mSocket.send(decodedData);
         }
         else {
             //  If the client has not yet connected to us but we have received a scan then buffer it
